@@ -146,7 +146,6 @@ $currentPage = basename($_SERVER['PHP_SELF']);
       <!-- Logout ko aakhir (right) mein kar diya -->
       <li><a href="logout.php" class="<?= $currentPage === 'logout.php' ? 'active' : '' ?>">Logout</a></li>
     <?php else: ?>
-      <li><a href="signup.php" class="<?= $currentPage === 'signup.php' ? 'active' : '' ?>">Signup</a></li>
       <li><a href="login.php" class="<?= $currentPage === 'login.php' ? 'active' : '' ?>">Login</a></li>
     <?php endif; ?>
 

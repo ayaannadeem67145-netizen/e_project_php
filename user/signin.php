@@ -215,11 +215,23 @@ if (isset($_GET['platform'])) {
   <main>
     <div class="signin-box">
       <h2>SIGN IN TO BOOK MOVIES</h2>
-      <div class="social-buttons">
-        <a href="?platform=google" class="google"><i class="fab fa-google"></i> Sign in with Google</a>
-        <a href="?platform=facebook" class="facebook"><i class="fab fa-facebook-f"></i> Sign in with Facebook</a>
-        <a href="?platform=x" class="x"><i class="fab fa-x-twitter"></i> Sign in with X</a>
-      </div>
+      <form action="signup.php" method="POST">
+    
+    <input type="text" name="name" placeholder="Full Name" required 
+    style="width:100%; padding:12px; margin-bottom:15px; border-radius:8px; border:none;">
+
+    <input type="email" name="email" placeholder="Email Address" required 
+    style="width:100%; padding:12px; margin-bottom:15px; border-radius:8px; border:none;">
+
+    <input type="password" name="password" placeholder="Password" required 
+    style="width:100%; padding:12px; margin-bottom:20px; border-radius:8px; border:none;">
+
+    <button type="submit" 
+    style="width:100%; padding:14px; background:#ff1a1a; border:none; border-radius:10px; color:white; font-weight:bold;">
+        Sign Up
+    </button>
+
+</form>
       <div class="footer">
         <a href="login.php"><i class="fas fa-arrow-left"></i> Back to Login</a>
       </div>

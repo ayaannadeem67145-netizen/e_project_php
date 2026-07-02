@@ -8,9 +8,40 @@ if (!isset($_SESSION['user']) && isset($_COOKIE['user'])) {
 $loggedIn = isset($_SESSION['user']);
 
 $id = $_GET['id'];
-$movie = mysqli_fetch_assoc(mysqli_query($con, "SELECT * FROM movie WHERE id = '$id'"));
-$details = mysqli_fetch_assoc(mysqli_query($con, "SELECT * FROM movie_details WHERE movie_id = '$id'"));
 
+// 1. Apni TMDB API Key yahan dalein
+$api_key = "dfbd45f87596dc8b931f5a0625c2a168"; 
+
+// 2. TMDB API se Movie Details fetch karne ka URL
+$api_url = "https://api.themoviedb.org/3/movie/" . $id . "?api_key=" . $api_key . "&language=en-US";
+
+// 3. API se data nikalna
+$response = @file_get_contents($api_url);
+$tmdb_movie = json_decode($response, true);
+
+if ($tmdb_movie) {
+    // Aapke HTML ke mutabik data ko map karna (image_95b8c4.png ke liye)
+    $movie = [
+        'id' => $tmdb_movie['id'],
+        'name' => $tmdb_movie['title'],
+        'cover_image' => "https://image.tmdb.org/t/p/w500" . $tmdb_movie['poster_path'],
+        'genre' => isset($tmdb_movie['genres'][0]['name']) ? $tmdb_movie['genres'][0]['name'] : 'Action',
+        'show_date' => isset($tmdb_movie['release_date']) ? $tmdb_movie['release_date'] : 'Coming Soon',
+        'show_time' => '07:00 PM', // API mein time nahi hota, isse local rakhlein
+        'ticket_price' => '3000'    // Apni marzi ka koi bhi default price rakhlein
+    ];
+
+    // Details section ke liye data mapping (Duration aur Description)
+    $runtime = isset($tmdb_movie['runtime']) ? $tmdb_movie['runtime'] : 120;
+    $details = [
+        'duration_hours' => floor($runtime / 60),
+        'duration_minutes' => $runtime % 60,
+        'description' => $tmdb_movie['overview']
+    ];
+} else {
+    $movie = null;
+    $details = null;
+}
 
 ?>
 

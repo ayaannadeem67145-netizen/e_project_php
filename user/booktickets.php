@@ -7,7 +7,32 @@ global $con;
 include('header.php');
 $user_email = $_SESSION['user'];
 $id = $_GET['id'];
-$rec = mysqli_fetch_assoc(mysqli_query($con, "SELECT * FROM movie WHERE id = '$id'"));
+
+// 1. Apni TMDB API Key yahan dalein (Jo index.php mein use ki hai)
+$api_key = "dfbd45f87596dc8b931f5a0625c2a168"; 
+
+// 2. TMDB API se Movie Details fetch karna
+$api_url = "https://api.themoviedb.org/3/movie/" . $id . "?api_key=" . $api_key . "&language=en-US";
+$response = @file_get_contents($api_url);
+$tmdb_movie = json_decode($response, true);
+
+if ($tmdb_movie) {
+    // Array ko waisa hi banaya jaisa aapka niche ka code expect kar raha hai
+    $rec = [
+        'name' => $tmdb_movie['title'],
+        'show_date' => isset($tmdb_movie['release_date']) ? $tmdb_movie['release_date'] : date('Y-m-d'),
+        'show_time' => '19:00:00', // Default time (7 PM) kyunki API mein time nahi hota
+        'ticket_price' => '3000'     // Apni marzi ka koi bhi ticket price rakhlein
+    ];
+} else {
+    // Fallback agar internet ya API na chale
+    $rec = [
+        'name' => 'Unknown Movie',
+        'show_date' => date('Y-m-d'),
+        'show_time' => '19:00:00',
+        'ticket_price' => '3000'
+    ];
+}
 
 $event_name = $rec['name'] . " Movie";
 $bookedSeatsQ = mysqli_query($con, "SELECT seat_id FROM tickets WHERE event = '$event_name' AND status='booked'");

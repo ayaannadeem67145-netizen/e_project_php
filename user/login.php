@@ -7,29 +7,34 @@ if (isset($_POST['btn'])) {
     $email = trim($_POST['email']);
     $password = trim($_POST['password']);
 
-    if (empty($email) || empty($password)) {
+  if (empty($email) || empty($password)) {
         echo "<script>alert('Please fill in all the fields.');</script>";
     } else {
-        $query = "SELECT * FROM login WHERE email='$email'";
+        // SQL Query ekdum sahi format mein
+        $query = "SELECT * FROM login WHERE email = '$email'";
+
         $result = mysqli_query($con, $query);
 
+        // Pehle check karein ki user mila ya nahi
         if ($result && mysqli_num_rows($result) === 1) {
             $user = mysqli_fetch_assoc($result);
+            
+            // Ab password verify karein
             if (password_verify($password, $user['password'])) {
                 $_SESSION['user'] = $email;
-$_SESSION['user_id'] = $user['id'];
-$_SESSION['role_id'] = $user['role_id'];
-$_SESSION['show_review_popup'] = true;
-setcookie("user", $email, time() + (60 * 60 * 24 * 7), "/");
+                $_SESSION['user_id'] = $user['id'];      
+                $_SESSION['role_id'] = $user['role_id'];  
+                $_SESSION['show_review_popup'] = true;
+                setcookie("user", $email, time() + (60 * 60 * 24 * 7), "/");
 
-// Role ke hisaab se redirect
-if ($user['role_id'] == 1) {
-    header("Location: admin.php");
-} elseif ($user['role_id'] == 2) {
-    header("Location: dashboard.php");
-} else {
-    header("Location: index.php");
-}
+                // Role ke hisaab se redirect
+                if ($user['role_id'] == 1) {
+                    header("Location: ../admin/admin.php");
+                } elseif ($user['role_id'] == 2) {
+                    header("Location: dashboard.php");
+                } else {
+                    header("Location: index.php");
+                }
                 exit();
             } else {
                 echo "<script>alert('Incorrect password');</script>";

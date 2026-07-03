@@ -244,4 +244,4 @@ if (isset($_POST['signup'])) {
 
   </div>
 </body>
-</html>
+</html>  

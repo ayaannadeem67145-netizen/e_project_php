@@ -463,19 +463,12 @@ $loggedIn = isset($_SESSION['user']);
     </div>
   </div>
 
-  <h2 class="index-heading">Movies</h2>
+  <h2 class="index-heading">Scheduled Movies</h2>
   <p class="movie-subheading">Book the ticket of your favorite movie</p>
 </div>
 
 
-<div class="genre-scroll" id="genreBoxScroll">
-  <?php
-  $genres = ['Action','Adventure','Animation','Biography','Comedy','Crime','Documentary','Drama','Family','Fantasy','Fictional','History','Horror','Musical','Mystery','Romance','Sci-Fi','Sport','Thriller','War','Western','Superhero','Psychological','Disaster','Noir','Short'];
-  foreach ($genres as $genre) {
-    echo "<div class='genre-box' data-genre='" . strtolower($genre) . "'>" . $genre . "</div>";
-  }
-  ?>
-</div>
+
 
 <div class="cards-container" id="movieList">
   <?php

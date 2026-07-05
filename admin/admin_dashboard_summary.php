@@ -8,8 +8,9 @@ if (!isset($_SESSION['admin'])) {
 
 
 
-include('dashheader.php');
-include('dbconfig.php');
+include('../user/dashheader.php');
+include('../user/dbconfig.php');
+global $con;
 ?>
 
 <?php
@@ -69,13 +70,7 @@ while ($row = mysqli_fetch_assoc($chart_data)) {
 }
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Admin Dashboard Overview</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <style>
     body {
       background-color: #000;
@@ -99,9 +94,13 @@ while ($row = mysqli_fetch_assoc($chart_data)) {
       font-weight: bold;
     }
     .dashboard-container {
-      margin-left: 25%;
-      padding: 30px;
-    }
+    position: absolute;
+    top: 70px;         /* Yeh top waale "MYMOVIES ADMIN" bar ke thik neeche set karega */
+    left: 25%;         /* Yeh sidebar ke thik right side se shuru karega */
+    width: 75%;        /* Baki bachi hui poori screen content ko de dega */
+    padding: 30px;
+    box-sizing: border-box; /* Padding se width kharab nahi hogi */
+}
     canvas {
       background-color: #111;
       border-radius: 10px;
@@ -126,97 +125,94 @@ while ($row = mysqli_fetch_assoc($chart_data)) {
 }
 
   </style>
-</head>
-<body>
+
+
   <div class="dashboard-container">
 
-
     <div class="mb-4" style="color: yellow;">
-      Showing results from <strong><?php echo explode(" ", $start_date)[0]; ?></strong> to <strong><?php echo explode(" ", $end_date)[0]; ?></strong>
+        Showing results from <strong><?php echo explode(" ", $start_date)[0]; ?></strong> to <strong><?php echo explode(" ", $end_date)[0]; ?></strong>
     </div>
 
     <div class="filter-btns mb-4">
-      <a href="?filter=today" class="<?php echo $filter == 'today' ? 'active' : ''; ?>">Today</a>
-      <a href="?filter=week" class="<?php echo $filter == 'week' ? 'active' : ''; ?>">Week</a>
-      <a href="?filter=month" class="<?php echo $filter == 'month' ? 'active' : ''; ?>">Month</a>
+        <a href="?filter=today" class="<?php echo $filter == 'today' ? 'active' : ''; ?>">Today</a>
+        <a href="?filter=week" class="<?php echo $filter == 'week' ? 'active' : ''; ?>">Week</a>
+        <a href="?filter=month" class="<?php echo $filter == 'month' ? 'active' : ''; ?>">Month</a>
     </div>
 
     <div class="row mb-4">
-      <div class="col-md-3">
-        <div class="card p-3 text-center">
-          <div class="card-title">Total Users Bought Tickets</div>
-          <div class="card-value"><?php echo $total_users; ?></div>
+        <div class="col-md-3">
+            <div class="card p-3 text-center">
+                <div class="card-title">Total Users Bought Tickets</div>
+                <div class="card-value"><?php echo $total_users; ?></div>
+            </div>
         </div>
-      </div>
-      <div class="col-md-3">
-        <div class="card p-3 text-center">
-          <div class="card-title">Tickets Sold</div>
-          <div class="card-value"><?php echo $tickets_today; ?></div>
+        <div class="col-md-3">
+            <div class="card p-3 text-center">
+                <div class="card-title">Tickets Sold</div>
+                <div class="card-value"><?php echo $tickets_today; ?></div>
+            </div>
         </div>
-      </div>
-      <div class="col-md-3">
-        <div class="card p-3 text-center">
-          <div class="card-title">Total Earnings</div>
-          <div class="card-value">Rs. <?php echo number_format($total_earning); ?></div>
+        <div class="col-md-3">
+            <div class="card p-3 text-center">
+                <div class="card-title">Total Earnings</div>
+                <div class="card-value">Rs. <?php echo number_format($total_earning); ?></div>
+            </div>
         </div>
-      </div>
-      <div class="col-md-3">
-        <div class="card p-3 text-center">
-          <div class="card-title">Most Active Movie</div>
-          <div class="card-value">
-            <?php echo $top_movie ? $top_movie['event'] : 'N/A'; ?>
-          </div>
+        <div class="col-md-3">
+            <div class="card p-3 text-center">
+                <div class="card-title">Most Active Movie</div>
+                <div class="card-value">
+                    <?php echo $top_movie ? $top_movie['event'] : 'N/A'; ?>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
 
     <div class="row">
-      <div class="col-md-6">
-        <h4 class="custom-heading">📈 Total Earnings Over Time</h4>
-        <canvas id="earningsChart" height="250"></canvas>
-      </div>
-      <div class="col-md-6">
-       <h4 class="custom-heading">🎟️ Total Tickets Sold Over Time</h4>
-
-        <canvas id="ticketsChart" height="250"></canvas>
-      </div>
+        <div class="col-md-6">
+            <h4 class="custom-heading">📈 Total Earnings Over Time</h4>
+            <canvas id="earningsChart" height="250"></canvas>
+        </div>
+        <div class="col-md-6">
+            <h4 class="custom-heading">🎟️ Total Tickets Sold Over Time</h4>
+            <canvas id="ticketsChart" height="250"></canvas>
+        </div>
     </div>
-  </div>
+</div>
 
-  <script>
+<script>
     const labels = <?php echo json_encode($dates); ?>;
     const earnings = <?php echo json_encode($earnings); ?>;
     const tickets = <?php echo json_encode($tickets); ?>;
 
     new Chart(document.getElementById('earningsChart'), {
-      type: 'line',
-      data: {
-        labels: labels,
-        datasets: [{
-          label: 'Earnings (Rs)',
-          data: earnings,
-          backgroundColor: 'rgba(229, 9, 20, 0.4)',
-          borderColor: '#e50914',
-          borderWidth: 2,
-          fill: true
-        }]
-      }
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Earnings (Rs)',
+                data: earnings,
+                backgroundColor: 'rgba(229, 9, 20, 0.4)',
+                borderColor: '#e50914',
+                borderWidth: 2,
+                fill: true
+            }]
+        }
     });
 
     new Chart(document.getElementById('ticketsChart'), {
-      type: 'line',
-      data: {
-        labels: labels,
-        datasets: [{
-          label: 'Tickets Sold',
-          data: tickets,
-          backgroundColor: 'rgba(40, 167, 69, 0.4)',
-          borderColor: '#28a745',
-          borderWidth: 2,
-          fill: true
-        }]
-      }
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Tickets Sold',
+                data: tickets,
+                backgroundColor: 'rgba(40, 167, 69, 0.4)',
+                borderColor: '#28a745',
+                borderWidth: 2,
+                fill: true
+            }]
+        }
     });
-  </script>
-</body>
-</html>
+   
+</script>

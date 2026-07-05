@@ -131,7 +131,7 @@ if (!isset($_SESSION['user']) && isset($_COOKIE['user'])) {
       margin-right: 3px;
     }
 
-    @media (max-width: 480px) {
+    @media (max-width: 480px) 
       .video-container {
         padding: 0 12px 40px;
       }
@@ -156,7 +156,7 @@ if (!isset($_SESSION['user']) && isset($_COOKIE['user'])) {
       #searchInput {
         padding: 12px 14px;
       }
-    }
+    
   </style>
 </head>
 <body>
@@ -169,113 +169,62 @@ if (!isset($_SESSION['user']) && isset($_COOKIE['user'])) {
 
 <div class="video-container" id="videoList">
   <?php
-  // Show admin-uploaded trailers first
-  $result = mysqli_query($con, "SELECT * FROM movie_teasers ORDER BY uploaded_at DESC");
-  while ($row = mysqli_fetch_assoc($result)) {
-      $title = htmlspecialchars($row['title']);
-      $description = htmlspecialchars($row['description']);
-      $video_url = htmlspecialchars($row['video_url']);
-      echo '
-      <div class="video-card" data-title="' . strtolower($title) . '">
-          <iframe src="' . $video_url . '" allowfullscreen></iframe>
-          <div class="info">
-              <h4>' . $title . '</h4>
-              <p>' . $description . '</p>
-          </div>
-          <div class="reviews">
-              <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-          </div>
-      </div>';
-  }
-  ?>
+// 1. TMDB API Key aur URL set karo
+$api_key = "dfbd45f87596dc8b931f5a0625c2a168"; 
+$url = "https://api.themoviedb.org/3/movie/popular?api_key=" . $api_key . "&language=en-US&page=1";
 
-  <div class="video-card" data-title="superman">
-    <iframe src="https://www.youtube.com/embed/brI3gt9girI" allowfullscreen></iframe>
-    <div class="info">
-      <h4>Superman</h4>
-      <p>A mind-bending thriller by Superman.</p>
-    </div>
-    <div class="reviews">
-      <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-    </div>
-  </div>
+// 2. API se data fetch karna
+$response = @file_get_contents($url);
 
- <div class="video-card" data-title="Inception">
-      <iframe src="https://www.youtube.com/embed/YoHD9XEInc0" allowfullscreen></iframe>
-      <div class="info">
-        <h4>Inception</h4>
-        <p>A mind-bending thriller by Inception.</p>
-      </div>
-      <div class="reviews">
-        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-      </div>
-    </div>
+if ($response !== false) {
+    $data = json_decode($response, true);
 
-    <div class="video-card" data-title="The Dark Knight">
-  <iframe src="https://www.youtube.com/embed/EXeTwQWrcwY" allowfullscreen></iframe>
-  <div class="info">
-    <h4>The Dark Knight</h4>
-    <p>A mind-bending thriller by The Dark Knight.</p>
-  </div>
-  <div class="reviews">
-    <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-  </div>
-</div>
+    if (!empty($data['results'])) {
+        foreach ($data['results'] as $record) {
+            $title = htmlspecialchars($record['title']);
+            $overview = htmlspecialchars($record['overview']);
+            $movie_id = $record['id']; // Movie ki unique ID
 
-<div class="video-card" data-title="Avengers: Endgame">
-  <iframe src="https://www.youtube.com/embed/TcMBFSGVi1c" allowfullscreen></iframe>
-  <div class="info">
-    <h4>Avengers: Endgame</h4>
-    <p>A mind-bending thriller by Avengers.</p>
-  </div>
-  <div class="reviews">
-    <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-  </div>
-</div>
+            // --- REAL YOUTUBE TRAILER FETCH LOGIC ---
+            // Har movie ki ID se uska trailer fetch karenge
+            $video_url = "https://www.youtube.com/embed/TcMBFSGVi1c"; // Default, agar trailer na mile
+            
+            $video_api_url = "https://api.themoviedb.org/3/movie/" . $movie_id . "/videos?api_key=" . $api_key . "&language=en-US";
+            $video_response = @file_get_contents($video_api_url);
+            
+            if ($video_response !== false) {
+                $video_data = json_decode($video_response, true);
+                if (!empty($video_data['results'])) {
+                    foreach ($video_data['results'] as $video) {
+                        // Agar Type 'Trailer' hai aur Site 'YouTube' hai toh key utha lo
+                        if ($video['type'] == 'Trailer' && $video['site'] == 'YouTube') {
+                            $video_url = "https://www.youtube.com/embed/" . $video['key'];
+                            break; // Pehla trailer milte hi loop rok do
+                        }
+                    }
+                }
+            }
+            // ----------------------------------------
 
-<div class="video-card" data-title="Interstellar">
-  <iframe src="https://www.youtube.com/embed/zSWdZVtXT7E" allowfullscreen></iframe>
-  <div class="info">
-    <h4>Interstellar</h4>
-    <p>A mind-bending thriller by Interstellar.</p>
-  </div>
-  <div class="reviews">
-    <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-  </div>
-</div>
-
-<div class="video-card" data-title="Joker">
-  <iframe src="https://www.youtube.com/embed/zAGVQLHvwOY" allowfullscreen></iframe>
-  <div class="info">
-    <h4>Joker</h4>
-    <p>A mind-bending thriller by Joker.</p>
-  </div>
-  <div class="reviews">
-    <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-  </div>
-</div>
-
-<div class="video-card" data-title="Spider-Man: No Way Home">
-  <iframe src="https://www.youtube.com/embed/JfVOs4VSpmA" allowfullscreen></iframe>
-  <div class="info">
-    <h4>Spider-Man: No Way Home</h4>
-    <p>A mind-bending thriller by Spider-Man.</p>
-  </div>
-  <div class="reviews">
-    <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-  </div>
-</div>
-
-<div class="video-card" data-title="The Batman">
-  <iframe src="https://www.youtube.com/embed/mqqft2x_Aa4" allowfullscreen></iframe>
-  <div class="info">
-    <h4>The Batman (2022)</h4>
-    <p>A mind-bending thriller by Batman.</p>
-  </div>
-  <div class="reviews">
-    <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-  </div>
-</div>
+            echo '
+            <div class="video-card" data-title="' . strtolower($title) . '">
+                <iframe src="' . $video_url . '" allowfullscreen></iframe>
+                <div class="info">
+                    <h4>' . $title . '</h4>
+                    <p>' . substr($overview, 0, 100) . '...</p>
+                </div>
+                <div class="reviews">
+                    <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                </div>
+            </div>';
+        }
+    } else {
+        echo '<div style="color: white; text-align: center; width: 100%;">No trailers found.</div>';
+    }
+} else {
+    echo '<div style="color: white; text-align: center; width: 100%;">API Connection Error.</div>';
+}
+?>
 </div>
 
 <?php include('footer.php'); ?>

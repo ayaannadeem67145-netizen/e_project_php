@@ -123,7 +123,8 @@ $currentPage = basename($_SERVER['PHP_SELF']);
 
 <!-- NAVBAR -->
 <nav class="navbar">
-  <a class="nav-logo" href="index.php">
+  <!-- Purane waale ko hata kar yeh likhein -->
+<a class="nav-logo" href="../user/index.php">
     <div class="navbar-logo">MyMovie</div>
   </a>
 
@@ -134,7 +135,8 @@ $currentPage = basename($_SERVER['PHP_SELF']);
   </div>
 
   <ul class="navbar-links" id="navbar-links">
-    <li><a href="index.php" class="<?= $currentPage === 'index.php' ? 'active' : '' ?>">Home</a></li>
+    <!-- Purane waale ko hata kar yeh likhein -->
+    <li><a href="../user/index.php" class="<?php echo $currentPage === 'index.php' ? 'active' : ''; ?>">Home</a></li>
     <li><a href="movies.php" class="<?= $currentPage === 'movies.php' ? 'active' : '' ?>">Trailers</a></li>
     <li><a href="aboutus.php" class="<?= $currentPage === 'aboutus.php' ? 'active' : '' ?>">About us</a></li>
     <li><a href="help.php" class="<?= $currentPage === 'help.php' ? 'active' : '' ?>">Help</a></li>

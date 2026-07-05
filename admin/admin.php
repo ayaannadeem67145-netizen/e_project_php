@@ -1,8 +1,9 @@
 <?php 
 require_once '../includes/auth.php';
 require_role(ROLE_ADMIN);
-include('dbconfig.php');
-include('header.php'); 
+// Line 4 aur 5 ko hata kar yeh likhein:
+include('../user/dbconfig.php');
+include('../user/header.php');
 ?>
 
 <?php
@@ -14,7 +15,7 @@ if(isset($_POST['btnSave'])){
   $filename = $_FILES['cover_image']['name'];
   $filesize = $_FILES['cover_image']['size'];
   $Tmpname = $_FILES['cover_image']['tmp_name'];
-  $filepath = "./uploads/" . $filename;
+  $filepath = "../user/uploads/" . $filename;
   move_uploaded_file($Tmpname , $filepath);
   mysqli_query($con , "INSERT INTO `movie`(`name`, `genre`, `cover_image`) VALUES ('$name','$genre','$filepath')");
   unset($_POST['btnSave']);
@@ -233,8 +234,18 @@ if (isset($_POST['btnDel'])) {
               <td><?php echo  $record['id'] ?></td>
               <td><?php echo  $record['name'] ?></td>
               <td><?php echo  $record['genre'] ?></td>
-              <td> <img src="<?php echo  $record['cover_image']; ?>" style="width:70px;" class=""  alt=""></td>
-              <td>
+<td>
+    <?php
+    $img = $record['cover_image'];
+    if (strpos($img, 'http') === 0) {
+        echo '<img src="'.$img.'" style="width:70px;">';
+    } else {
+        // Agar local path hai toh seedha user/uploads se uthaye
+        echo '<img src="../user/uploads/'.basename($img).'" style="width:70px;">';
+    }
+    ?>
+</td>
+            <td>
                 <form method="POST">
                   <a href="update.php?id=<?php echo $record['id'] ?>"><i class="fa-solid fa-pen-to-square"></i></a>
 
@@ -253,7 +264,7 @@ if (isset($_POST['btnDel'])) {
 
   </div>
 <?php
-include('footer.php');
+include('../user/footer.php');
 
 ?>
 </body>

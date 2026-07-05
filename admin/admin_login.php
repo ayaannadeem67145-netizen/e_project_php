@@ -1,7 +1,7 @@
 <?php
 session_start();
-include('dbconfig.php');
-
+include('../user/dbconfig.php');
+global $con;
 // If already logged in, redirect to dashboard
 if (isset($_SESSION['admin_email'])) {
     header("Location: admin_dashboard_summary.php");
@@ -14,7 +14,7 @@ if (isset($_POST['login'])) {
     $email = trim($_POST['email']);
     $password = trim($_POST['password']);
 
-    $stmt = $con->prepare("SELECT * FROM admin WHERE email = ?");
+    $stmt = $con->prepare("SELECT * FROM login WHERE email = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
     $res = $stmt->get_result();
@@ -23,7 +23,7 @@ if (isset($_POST['login'])) {
         $row = $res->fetch_assoc();
 
         // In production, use password_verify(). For now, plain match:
-        if ($password === $row['password']) {
+        if ($row && password_verify($password, $row['password'])) {
 
             // ✅ Store all required session values
             $_SESSION['admin'] = true;

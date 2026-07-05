@@ -449,18 +449,7 @@ $loggedIn = isset($_SESSION['user']);
     <button id="micBtn" title="Click to speak"><i class="fas fa-microphone"></i></button>
 
     </div>
-    <div class="day-filter-container">
-      <select id="daySearch">
-        <option value="">🎬 Filter by Day</option>
-        <option value="Sunday">Sunday</option>
-        <option value="Monday">Monday</option>
-        <option value="Tuesday">Tuesday</option>
-        <option value="Wednesday">Wednesday</option>
-        <option value="Thursday">Thursday</option>
-        <option value="Friday">Friday</option>
-        <option value="Saturday">Saturday</option>
-      </select>
-    </div>
+    
   </div>
 
   <h2 class="index-heading">Scheduled Movies</h2>
@@ -471,51 +460,52 @@ $loggedIn = isset($_SESSION['user']);
 
 
 <div class="cards-container" id="movieList">
-  <?php
-// TMDB API Key aur URL
-$api_key = "dfbd45f87596dc8b931f5a0625c2a168";
-$url = "https://api.themoviedb.org/3/movie/now_playing?api_key=" . $api_key . "&language=en-US&page=1";
+<?php
+// 1. Apni database connection file ko include karo
+include('dbconfig.php'); 
 
-// API se movies fetch karna
-$response = @file_get_contents($url);
-if ($response !== false) {
-    $data = json_decode($response, true);
-    
-    if (!empty($data['results'])) {
-        foreach ($data['results'] as $record) {
-            $movie_id = $record['id'];
-            $title = htmlspecialchars($record['title']);
-            $poster = "https://image.tmdb.org/t/p/w500" . $record['poster_path'];
-            
-            // Dummy date aur genre filter ke liye (taaki aapki JavaScript crash na ho)
-            $show_date = date('Y-m-d'); 
-            $day_name = strtolower(date('l'));
-            $genre = "action"; // Default filter tag
-            ?>
-            
-            <div class="card" 
-                 data-name="<?= strtolower($title); ?>" 
-                 data-day="<?= $day_name; ?>" 
-                 data-genre="<?= $genre; ?>">
-                 
-                <a href="viewmovie.php?id=<?php echo $movie_id; ?>">
-                    <img src="<?= $poster; ?>" alt="<?= $title; ?>">
-                    <div class="card-info">
-                        <h5><?= $title; ?></h5>
-                        <p><?= date('l, d M Y'); ?></p>
-                    </div>
-                </a>
-            </div>
+/** @var mysqli $con */
+// 2. Aaj ki date nikalne ke liye variable (taaki JavaScript filter kharab na ho)
+$day_name = strtolower(date('l')); 
 
-            <?php
-        }
-    } else {
-        echo "<div id='noResult'>No movies found.</div>";
+// 3. 'new_store' database se aaj ki 3 movies uthane ki query
+// Hamein WHERE show_date = CURDATE() hata dena hai
+$sql = "SELECT * FROM scheduled_movies ORDER BY FIELD(show_slot, 'Morning', 'Evening', 'Night') LIMIT 3";
+$result = mysqli_query($con, $sql); // Tumhaara '$con' variable yahan use ho gaya
+
+if ($result && mysqli_num_rows($result) > 0) {
+    while ($record = mysqli_fetch_assoc($result)) {
+        // Database se data fetch karna
+        $movie_id = $record['id'];
+        $title = htmlspecialchars($record['movie_title']);
+        $poster = $record['poster_image']; // Poster ka image path/URL
+        $genre = "action"; // Default filter tag
+        ?>
+
+       <div class="card" 
+             data-name="<?= strtolower($title); ?>" 
+             data-day="<?= $day_name; ?>" 
+             data-genre="<?= $genre; ?>"
+             style="width: 230px; min-height: 350px; margin: 10px; display: inline-block; vertical-align: top;">
+            
+            <a href="viewmovie.php?id=<?php echo $movie_id; ?>">
+                <!-- Image ki size fix kar di taaki broken hone par bhi layout na bigde -->
+                <img src="<?= $poster; ?>" alt="<?= $title; ?>" style="width: 100%; height: 300px; object-fit: cover; background-color: #222;">
+                
+                <div class="card-info" style="text-align: center; padding: 10px 5px;">
+                    <h5 style="color: #ffffff; font-size: 15px; font-weight: bold; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); margin: 0;"><?= $title; ?></h5>
+                </div>
+            </a>
+        </div>
+
+        <?php
     }
 } else {
-    echo "<div id='noResult'>API Connection Error!</div>";
+    // Agar aaj koi movie scheduled nahi hai toh yeh dikhega
+    echo "<div id='noResult' style='color:white; padding:20px;'>Aaj ke liye koi movie scheduled nahi hai. Please database check karein!</div>";
 }
 ?>
+
  
 </div>
 

@@ -4,11 +4,32 @@ require_role(ROLE_USER);
 
 include('dbconfig.php');
 global $con;
-include('header.php');
+
 $user_email = $_SESSION['user'];
 $id = $_GET['id'];
 
-// 1. Apni TMDB API Key yahan dalein (Jo index.php mein use ki hai)
+// 🛑 STEP 1: Redirect logic ko sabse upar rakhna hai (Taaki white screen error na aaye)
+if (isset($_POST['btnSave'])) {
+    $_SESSION['booking'] = [
+        'name'     => $_POST['name'],
+        'quantity' => $_POST['quantity'],
+        'event'    => $_POST['event'],
+        'date'     => $_POST['date'],
+        'time'     => $_POST['time'],
+        'price'    => $_POST['price'],
+        'total'    => $_POST['total'],
+        'seats'    => $_POST['selected_seats'],
+        'email'    => $user_email,
+    ];
+
+    header("Location: payment.php");
+    exit();
+}
+
+// 🛑 STEP 2: Ab jab redirect check ho gaya, toh tasalli se header include karo
+include('header.php');
+
+// 1. Apni TMDB API Key yahan dalein
 $api_key = "dfbd45f87596dc8b931f5a0625c2a168"; 
 
 // 2. TMDB API se Movie Details fetch karna
@@ -17,15 +38,13 @@ $response = @file_get_contents($api_url);
 $tmdb_movie = json_decode($response, true);
 
 if ($tmdb_movie) {
-    // Array ko waisa hi banaya jaisa aapka niche ka code expect kar raha hai
     $rec = [
         'name' => $tmdb_movie['title'],
         'show_date' => isset($tmdb_movie['release_date']) ? $tmdb_movie['release_date'] : date('Y-m-d'),
-        'show_time' => '19:00:00', // Default time (7 PM) kyunki API mein time nahi hota
-        'ticket_price' => '3000'     // Apni marzi ka koi bhi ticket price rakhlein
+        'show_time' => '19:00:00', 
+        'ticket_price' => '3000'    
     ];
 } else {
-    // Fallback agar internet ya API na chale
     $rec = [
         'name' => 'Unknown Movie',
         'show_date' => date('Y-m-d'),
@@ -44,25 +63,7 @@ while ($r = mysqli_fetch_assoc($bookedSeatsQ)) {
 $max_seats = 200;
 $remaining_seats = $max_seats - count($bookedSeats);
 $is_sold_out = $remaining_seats <= 0;
-
-if (isset($_POST['btnSave'])) {
-    $_SESSION['booking'] = [
-        'name'     => $_POST['name'],
-        'quantity' => $_POST['quantity'],
-        'event'    => $_POST['event'],
-        'date'     => $_POST['date'],
-        'time'     => $_POST['time'],
-        'price'    => $_POST['price'],
-        'total'    => $_POST['total'],
-        'seats'    => $_POST['selected_seats'],
-        'email'    => $user_email,
-    ];
-
-    header("Location: payment.php");
-    exit();
-}
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>

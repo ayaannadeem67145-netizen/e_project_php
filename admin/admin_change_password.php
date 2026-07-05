@@ -1,7 +1,7 @@
 <?php
 session_start();
-include('dbconfig.php');
-
+include('../user/dbconfig.php');
+global $con;
 $step = 1;
 $error = '';
 $success = '';
@@ -9,7 +9,7 @@ $success = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['check_email'])) {
         $email = trim($_POST['email']);
-        $stmt = $con->prepare("SELECT * FROM admin WHERE email = ?");
+        $stmt = $con->prepare("SELECT * FROM login WHERE email = ?");
         $stmt->bind_param("s", $email);
         $stmt->execute();
         $res = $stmt->get_result();
@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $new = $_POST['new_password'];
         $confirm = $_POST['confirm_password'];
 
-        $stmt = $con->prepare("SELECT password FROM admin WHERE email = ?");
+        $stmt = $con->prepare("SELECT password FROM login WHERE email = ?");
         $stmt->bind_param("s", $email);
         $stmt->execute();
         $res = $stmt->get_result();
@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($row && $current === $row['password']) {
             if ($new === $confirm) {
-                $update = $con->prepare("UPDATE admin SET password = ? WHERE email = ?");
+                $update = $con->prepare("UPDATE login SET password = ? WHERE email = ?");
                 $update->bind_param("ss", $new, $email);
                 $update->execute();
                 $success = "✅ Password updated successfully!";

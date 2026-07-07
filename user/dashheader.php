@@ -180,79 +180,83 @@ $isDashboardChild = in_array($currentPage, [
           <span><i class="fas fa-chart-bar me-2"></i> Dashboard</span>
           <i class="fas fa-chevron-down dropdown-arrow" style="<?= $isDashboardChild ? 'transform: rotate(180deg);' : ''; ?>"></i>
         </a>
-        <div class="collapse <?= $isDashboardChild ? 'show' : ''; ?>" id="dashboardDropdown">
-          <ul class="nav flex-column ms-3">
-            <li class="nav-item">
-              <a class="nav-link <?= $currentPage == 'admin_dashboard_summary.php' ? 'active' : ''; ?>" href="admin_dashboard_summary.php">📈 Summary</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link <?= $currentPage == 'dashboard_analytics.php' ? 'active' : ''; ?>" href="dashboard_analytics.php">📊 Analytics</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link <?= $currentPage == 'ticket_list.php' ? 'active' : ''; ?>" href="ticket_list.php">📋 Ticket List</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link <?= $currentPage == 'dashboard.php' ? 'active' : ''; ?>" href="dashboard.php">🎥 Uploaded Movies</a>
-            </li>
-            <li class="nav-item">
-  <a class="nav-link <?= $currentPage == 'trailer_dashboard.php' ? 'active' : ''; ?>" href="trailer_dashboard.php">🎞️ Teaser Dashboard</a>
+     <div class="collapse <?= $isDashboardChild ? 'show' : ''; ?>" id="dashboardDropdown">
+    <ul class="nav flex-column ms-3">
+        <li class="nav-item">
+            <a class="nav-link <?= $currentPage == 'admin_dashboard_summary.php' ? 'active' : ''; ?>" href="/movie_booking/admin/admin_dashboard_summary.php">📈 Summary</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link <?= $currentPage == 'dashboard_analytics.php' ? 'active' : ''; ?>" href="/movie_booking/user/dashboard_analytics.php">📊 Analytics</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link <?= $currentPage == 'booking.php' ? 'active' : ''; ?>" href="/movie_booking/user/booking.php">📋 Ticket List</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link <?= $currentPage == 'displaymovies.php' ? 'active' : ''; ?>" href="/movie_booking/user/displaymovies.php">🎥 Uploaded Movies</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link <?= $currentPage == 'displaytreaser.php' ? 'active' : ''; ?>" href="/movie_booking/user/displaytreaser.php">🎞️ Teaser Dashboard</a>
+        </li>
+    </ul>
+</div>
 </li>
           </ul>
         </div>
       </li>
 
-      <!-- 🎬 Other Items -->
-      <li class="nav-item">
-        <a class="nav-link <?= $currentPage == 'displaymovies.php' ? 'active' : ''; ?>" href="displaymovies.php">
-          <i class="fas fa-film me-2"></i> Display Movies
-        </a>
-      </li>
+ <!-- 🎬 Other Items -->
+    <li class="nav-item">
+      <a class="nav-link <?= $currentPage == 'displaymovies.php' ? 'active' : ''; ?>" href="/movie_booking/user/displaymovies.php">
+        <i class="fas fa-film me-2"></i> Display Movies
+      </a>
+    </li>
 
-      <li class="nav-item">
-        <a class="nav-link <?= $currentPage == 'displaytreaser.php' ? 'active' : ''; ?>" href="displaytreaser.php">
-          <i class="fas fa-play-circle me-2"></i> Display Treaser
-        </a>
-      </li>
+    <li class="nav-item">
+      <a class="nav-link <?= $currentPage == 'displaytreaser.php' ? 'active' : ''; ?>" href="/movie_booking/user/displaytreaser.php">
+        <i class="fas fa-play-circle me-2"></i> Display Treaser
+      </a>
+    </li>
 
-      <li class="nav-item">
-        <a class="nav-link <?= $currentPage == 'booking.php' ? 'active' : ''; ?>" href="booking.php">
-          <i class="fas fa-ticket-alt me-2"></i> Bookings
-        </a>
-      </li>
+    <li class="nav-item">
+      <a class="nav-link <?= $currentPage == 'booking.php' ? 'active' : ''; ?>" href="/movie_booking/user/booking.php">
+        <i class="fas fa-ticket-alt me-2"></i> Bookings
+      </a>
+    </li>
 
-      <li class="nav-item">
-        <a class="nav-link <?= $currentPage == 'earnings_summary.php' ? 'active' : ''; ?>" href="earnings_summary.php">
-          <i class="fas fa-coins me-2"></i> Earnings Summary
-        </a>
-      </li>
+    <li class="nav-item">
+      <a class="nav-link <?= $currentPage == 'earnings_summary.php' ? 'active' : ''; ?>" href="/movie_booking/user/earnings_summary.php">
+        <i class="fas fa-coins me-2"></i> Earnings Summary
+      </a>
+    </li>
 
-      <li class="nav-item">
-        <a class="nav-link <?= $currentPage == 'past_sales.php' ? 'active' : ''; ?>" href="past_sales.php">
-          <i class="fas fa-history me-2"></i> Past Sales
-        </a>
-      </li>
-    </ul>
+    <li class="nav-item">
+      <a class="nav-link <?= $currentPage == 'past_sales.php' ? 'active' : ''; ?>" href="/movie_booking/user/past_sales.php">
+        <i class="fas fa-history me-2"></i> Past Sales
+      </a>
+    </li>
+  </ul>
 
-    <h4>Website Pages</h4>
+  <h4>Website Pages</h4>
 
-    <ul class="nav flex-column mb-2">
-      <li class="nav-item">
-        <a class="nav-link <?= $currentPage == 'index.php' ? 'active' : ''; ?>" href="index.php">
-          <i class="fas fa-home me-2"></i> Index
-        </a>
-      </li>
+  <ul class="nav flex-column mb-2">
+    <li class="nav-item">
+      <a class="nav-link <?= $currentPage == 'index.php' ? 'active' : ''; ?>" href="/movie_booking/user/index.php">
+        <i class="fas fa-home me-2"></i> Index
+      </a>
+    </li>
 
-      <li class="nav-item">
-        <a class="nav-link <?= $currentPage == 'movies.php' ? 'active' : ''; ?>" href="movies.php">
-          <i class="fas fa-clapperboard me-2"></i> Movies Treaser
-        </a>
-      </li>
+    <li class="nav-item">
+      <a class="nav-link <?= $currentPage == 'movies.php' ? 'active' : ''; ?>" href="/movie_booking/user/movies.php">
+        <i class="fas fa-clapperboard me-2"></i> Movies Treaser
+      </a>
+    </li>
 
-      <!-- <li class="nav-item">
-        <a class="nav-link <?= $currentPage == 'admin_change_password.php' ? 'active' : ''; ?>" href="admin_change_password.php">
-          <i class="fas fa-key me-2"></i> Change Password
-        </a>
-      </li> -->
+    <li class="nav-item">
+      <a class="nav-link" href="/movie_booking/admin/admin_dashboard_summary.php">
+        <i class="fas fa-user-shield me-2"></i> Admin
+      </a>
+    </li>
+  </ul>
 
 <li class="nav-item">
   <a href="admin_profile.php" class="admin-profile d-flex align-items-center text-decoration-none">

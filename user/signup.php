@@ -222,7 +222,7 @@ if (isset($_POST['signup'])) {
 </head>
 <body>
   <div class="signup-container">
-    <h2>SIGN UP FIRST PLEASE</h2>
+    <h2>LOG IN MY MOVIE</h2>
     <form method="post" autocomplete="off">
       <div class="input-group">
         <input type="email" id="email" name="email" required placeholder=" " />

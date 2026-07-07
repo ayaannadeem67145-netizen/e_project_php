@@ -214,7 +214,7 @@ if (isset($_GET['platform'])) {
 <body>
   <main>
     <div class="signin-box">
-      <h2>SIGN IN TO BOOK MOVIES</h2>
+      <h2>SIGN IN TO MY MOVIE</h2>
       <form action="signup.php" method="POST">
     
     <input type="text" name="name" placeholder="Full Name" required 

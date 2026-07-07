@@ -125,9 +125,7 @@ if (!isset($_SESSION['user']) || !isset($_SESSION['booking'])) {
       <button class="payment-option" name="method" value="card">
         <i class="fas fa-credit-card"></i> Pay with Debit/Credit Card
       </button>
-      <button class="payment-option" name="method" value="cod">
-        <i class="fas fa-truck"></i> Cash on Delivery
-      </button>
+     
     </form>
   </div>
 </body>

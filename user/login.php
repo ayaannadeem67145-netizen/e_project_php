@@ -256,7 +256,7 @@ if (isset($_POST['btn'])) {
 </head>
 <body>
   <div class="login-container">
-    <h2>LOGIN TO BOOK MOVIES</h2>
+    <h2>LOGIN TO MY MOVIE</h2>
     <form method="post">
       <div class="form-group">
         <input type="email" id="email" name="email" placeholder=" " required />

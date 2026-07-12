@@ -470,15 +470,15 @@ $day_name = strtolower(date('l'));
 
 // 3. 'new_store' database se aaj ki 3 movies uthane ki query
 // Hamein WHERE show_date = CURDATE() hata dena hai
-$sql = "SELECT * FROM scheduled_movies ORDER BY FIELD(show_slot, 'Morning', 'Evening', 'Night') LIMIT 3";
+$sql = "SELECT * FROM movie ORDER BY id DESC LIMIT 3";
 $result = mysqli_query($con, $sql); // Tumhaara '$con' variable yahan use ho gaya
 
 if ($result && mysqli_num_rows($result) > 0) {
     while ($record = mysqli_fetch_assoc($result)) {
         // Database se data fetch karna
         $movie_id = $record['id'];
-        $title = htmlspecialchars($record['movie_title']);
-        $poster = $record['poster_image']; // Poster ka image path/URL
+        $title = htmlspecialchars($record['name']);
+        $poster = "admin/uploads/" . $record['cover_image'];
         $genre = "action"; // Default filter tag
         ?>
 

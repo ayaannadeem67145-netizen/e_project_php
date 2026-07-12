@@ -226,10 +226,9 @@ if (isset($_GET['platform'])) {
     <input type="password" name="password" placeholder="Password" required 
     style="width:100%; padding:12px; margin-bottom:20px; border-radius:8px; border:none;">
 
-    <button type="submit" 
-    style="width:100%; padding:14px; background:#ff1a1a; border:none; border-radius:10px; color:white; font-weight:bold;">
-        Sign Up
-    </button>
+    <button type="submit" name="signup" style="width:100%; padding:14px; background:#ff1a1a; border:none; border-radius:10px; color:white; font-weight:bold;">
+    Sign Up
+</button>
 
 </form>
       <div class="footer">

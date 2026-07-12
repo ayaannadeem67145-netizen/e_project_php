@@ -3,12 +3,15 @@ session_start();
 include('dbconfig.php');
 
 if (isset($_POST['signup'])) {
+    global $con; 
+    
     $email = trim($_POST['email']);
     $password = trim($_POST['password']);
 
     if (empty($email) || empty($password)) {
         echo "<script>alert('Please fill in all the fields.');</script>";
     } else {
+        // 1. Pehle check karein email pehle se database mein hai ya nahi
         $query = "SELECT * FROM login WHERE email=?";
         $stmt = mysqli_prepare($con, $query);
         mysqli_stmt_bind_param($stmt, "s", $email);
@@ -16,26 +19,37 @@ if (isset($_POST['signup'])) {
         $result = mysqli_stmt_get_result($stmt);
 
         if ($result && mysqli_num_rows($result) > 0) {
-            echo "<script>alert('Email already exists. Please use a different email or log in.');</script>";
+            echo "<script>alert('Email already exists. Please log in.');</script>";
         } else {
+            // 2. Password ko secure hash karein
             $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-            $insertQuery = mysqli_prepare($con, "INSERT INTO login (email, password) VALUES (?, ?)");
-            mysqli_stmt_bind_param($insertQuery, "ss", $email, $hashedPassword);
+            
+            // 3. Aapke database table ke hisab se default values
+            $default_role_id = 3;
+            $default_role_name = 'user';
+
+            // 4. Poori query jo saare columns ko satisfy karegi (4 placeholders)
+            $insertQuery = mysqli_prepare($con, "INSERT INTO login (email, password, role_id, role) VALUES (?, ?, ?, ?)");
+            
+            // 4 parameters bind ho rahe hain correctly: ssis (string, string, integer, string)
+            mysqli_stmt_bind_param($insertQuery, "ssis", $email, $hashedPassword, $default_role_id, $default_role_name);
 
             if (mysqli_stmt_execute($insertQuery)) {
-                $_SESSION['user'] = $email;
-                setcookie("user", $email, time() + (60 * 60 * 24 * 7), "/");
-                $_SESSION['show_review_popup'] = true;
-                header("Location: index.php");
-                exit();
-            } else {
-                echo "<script>alert('Something went wrong. Please try again.');</script>";
+    // Automatic login wale sessions aur cookies humne hata diye hain
+    
+    echo "<script>
+            alert('Registration Successful! Please login to continue.');
+            window.location.href = 'login.php'; 
+          </script>";
+    exit();
+} else {
+                // Agar ab bhi database koi error de, toh yeh alert mein error print kar dega
+                echo "<script>alert('Database Error: " . mysqli_stmt_error($insertQuery) . "');</script>";
             }
         }
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>

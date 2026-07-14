@@ -1,14 +1,16 @@
 <?php
+session_start();
 require_once '../includes/auth.php';
 require_role(ROLE_USER);
 
 include('dbconfig.php');
 global $con;
+/** @var mysqli $con */
 
 $user_email = $_SESSION['user'];
-$id = $_GET['id'];
+$id = isset($_GET['id']) ? mysqli_real_escape_string($con, $_GET['id']) : 0;
 
-// 🛑 STEP 1: Redirect logic ko sabse upar rakhna hai (Taaki white screen error na aaye)
+// Redirect logic ko top par rakha hai (No white screen error)
 if (isset($_POST['btnSave'])) {
     $_SESSION['booking'] = [
         'name'     => $_POST['name'],
@@ -26,38 +28,41 @@ if (isset($_POST['btnSave'])) {
     exit();
 }
 
-// 🛑 STEP 2: Ab jab redirect check ho gaya, toh tasalli se header include karo
 include('header.php');
 
-// 1. Apni TMDB API Key yahan dalein
-$api_key = "dfbd45f87596dc8b931f5a0625c2a168"; 
+// Default fallback array taaki warnings bilkul na aayein
+$rec = [
+    'name' => 'Unknown Movie',
+    'show_date' => date('Y-m-d'),
+    'show_time' => '19:00:00',
+    'ticket_price' => '3000'
+];
 
-// 2. TMDB API se Movie Details fetch karna
-$api_url = "https://api.themoviedb.org/3/movie/" . $id . "?api_key=" . $api_key . "&language=en-US";
-$response = @file_get_contents($api_url);
-$tmdb_movie = json_decode($response, true);
-
-if ($tmdb_movie) {
-    $rec = [
-        'name' => $tmdb_movie['title'],
-        'show_date' => isset($tmdb_movie['release_date']) ? $tmdb_movie['release_date'] : date('Y-m-d'),
-        'show_time' => '19:00:00', 
-        'ticket_price' => '3000'    
-    ];
-} else {
-    $rec = [
-        'name' => 'Unknown Movie',
-        'show_date' => date('Y-m-d'),
-        'show_time' => '19:00:00',
-        'ticket_price' => '3000'
-    ];
+// Local database se movie details fetch karke exact $rec array mein dalna
+if ($id > 0) {
+    $query = "SELECT * FROM movie WHERE id = '$id'";
+    $result = mysqli_query($con, $query);
+    
+    if ($result && mysqli_num_rows($result) > 0) {
+        $row = mysqli_fetch_assoc($result);
+        $rec = [
+            'name'         => $row['name'],
+            'show_date'    => $row['show_date'],
+            'show_time'    => $row['show_time'],
+            'ticket_price' => $row['ticket_price']
+        ];
+    }
 }
 
+// Seat logic ke liye exact $event_name setup karna jo JavaScript use kar raha hai
 $event_name = $rec['name'] . " Movie";
-$bookedSeatsQ = mysqli_query($con, "SELECT seat_id FROM tickets WHERE event = '$event_name' AND status='booked'");
+
+$bookedSeatsQ = mysqli_query($con, "SELECT seat_id FROM tickets WHERE event = '" . mysqli_real_escape_string($con, $event_name) . "' AND status='booked'");
 $bookedSeats = [];
-while ($r = mysqli_fetch_assoc($bookedSeatsQ)) {
-    $bookedSeats[] = $r['seat_id'];
+if ($bookedSeatsQ) {
+    while ($r = mysqli_fetch_assoc($bookedSeatsQ)) {
+        $bookedSeats[] = $r['seat_id'];
+    }
 }
 
 $max_seats = 200;

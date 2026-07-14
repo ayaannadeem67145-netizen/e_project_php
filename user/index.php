@@ -478,7 +478,7 @@ if ($result && mysqli_num_rows($result) > 0) {
         // Database se data fetch karna
         $movie_id = $record['id'];
         $title = htmlspecialchars($record['name']);
-        $poster = "admin/uploads/" . $record['cover_image'];
+        $poster = "uploads/" . $record['cover_image'];
         $genre = "action"; // Default filter tag
         ?>
 

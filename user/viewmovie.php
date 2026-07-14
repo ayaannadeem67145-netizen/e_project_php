@@ -1,48 +1,41 @@
 <?php
 include('header.php');
 include('dbconfig.php');
+/** @var mysqli $con */
 
-if (!isset($_SESSION['user']) && isset($_COOKIE['user'])) {
-    $_SESSION['user'] = $_COOKIE['user'];
+// 1. URL se ID get karna aur safe banana
+$movie_id = isset($_GET['id']) ? mysqli_real_escape_string($con, $_GET['id']) : 0;
+
+$movie = null;
+$details = null;
+
+// 2. Database se is specific movie ki details nikalna
+if ($movie_id > 0) {
+    $query = "SELECT * FROM movie WHERE id = '$movie_id'";
+    $result = mysqli_query($con, $query);
+
+    if ($result && mysqli_num_rows($result) > 0) {
+        $row = mysqli_fetch_assoc($result);
+
+        // Aapke HTML layout ke mutabik variables map karna
+        $movie = [
+            'id'          => $row['id'],
+            'name'        => $row['name'],
+            'cover_image' => 'uploads/' . $row['cover_image'], // Sahi path form kiya
+            'genre'       => $row['genre'],
+            'show_date'   => $row['show_date'],
+            'show_time'   => $row['show_time'],
+            'ticket_price'=> $row['ticket_price']
+        ];
+
+        // Description box ke liye structure (kyunki aapke DB me limited cols hain)
+        $details = [
+            'duration_hours'   => 2,
+            'duration_minutes' => 30,
+            'description'      => "Enjoy watching " . htmlspecialchars($row['name']) . " in high quality at our cinema. Secure your tickets now before slots run out!"
+        ];
+    }
 }
-$loggedIn = isset($_SESSION['user']);
-
-$id = $_GET['id'];
-
-// 1. Apni TMDB API Key yahan dalein
-$api_key = "dfbd45f87596dc8b931f5a0625c2a168"; 
-
-// 2. TMDB API se Movie Details fetch karne ka URL
-$api_url = "https://api.themoviedb.org/3/movie/" . $id . "?api_key=" . $api_key . "&language=en-US";
-
-// 3. API se data nikalna
-$response = @file_get_contents($api_url);
-$tmdb_movie = json_decode($response, true);
-
-if ($tmdb_movie) {
-    // Aapke HTML ke mutabik data ko map karna (image_95b8c4.png ke liye)
-    $movie = [
-        'id' => $tmdb_movie['id'],
-        'name' => $tmdb_movie['title'],
-        'cover_image' => "https://image.tmdb.org/t/p/w500" . $tmdb_movie['poster_path'],
-        'genre' => isset($tmdb_movie['genres'][0]['name']) ? $tmdb_movie['genres'][0]['name'] : 'Action',
-        'show_date' => isset($tmdb_movie['release_date']) ? $tmdb_movie['release_date'] : 'Coming Soon',
-        'show_time' => '07:00 PM', // API mein time nahi hota, isse local rakhlein
-        'ticket_price' => '3000'    // Apni marzi ka koi bhi default price rakhlein
-    ];
-
-    // Details section ke liye data mapping (Duration aur Description)
-    $runtime = isset($tmdb_movie['runtime']) ? $tmdb_movie['runtime'] : 120;
-    $details = [
-        'duration_hours' => floor($runtime / 60),
-        'duration_minutes' => $runtime % 60,
-        'description' => $tmdb_movie['overview']
-    ];
-} else {
-    $movie = null;
-    $details = null;
-}
-
 ?>
 
 <!DOCTYPE html>
@@ -243,7 +236,7 @@ if ($tmdb_movie) {
         <?php endif; ?>
 
         <div class="mt-4 d-flex flex-wrap gap-3">
-          <a href="#" class="btn btn-book" onclick="handleBooking(<?= $movie['id'] ?>)">Book Now</a>
+          <a href="booktickets.php?id=<?= $movie['id'] ?>" class="btn btn-book">Book Now</a>
           <a href="3d_cinema_demo.php" class="btn btn-book">Explore Cinema</a>
          
 
